@@ -42,6 +42,7 @@ namespace task2Console
             
             if (isIdExists(id) != -1){
                 genresList.RemoveAll(x => x.id == id);
+                
                 return 1;
             }
             return 0;

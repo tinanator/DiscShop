@@ -16,6 +16,13 @@ namespace task2Console
                 Console.WriteLine("id = " + id);
             }
         }
+        static void delete(Manager man, int id, string name) {   
+            if (man.delete(id) == 1) {
+                Console.WriteLine(name + " is deleted");
+            } else {
+                Console.WriteLine("No genre with such id");
+            }
+        }
         static string getName(ref String[] arg){
             string name = "";
             for (int i = 2; i < arg.Length; i++) {
@@ -220,33 +227,19 @@ namespace task2Console
                     case "delete":{ 
                         try{
                             if (arg[1] == "genre") {
-                                if (genreManager.delete(int.Parse(arg[2])) == 1) {
-                                    Console.WriteLine("Genre is deleted");
-                                } else{
-                                    Console.WriteLine("No genre with such id");
-                                }
+                                delete(genreManager, int.Parse(arg[2]), "genre");
+                                albumManager.deleteByGenre(int.Parse(arg[2]));
                             } 
                             else if (arg[1] == "country") {
-                                if (countryManager.delete(int.Parse(arg[2])) == 1) {
-                                    Console.WriteLine("Country is deleted");
-                                } else {
-                                    Console.WriteLine("No country with such id");
-                                }
+                                delete(countryManager, int.Parse(arg[2]), "country");
+                                albumManager.deleteByCountry(int.Parse(arg[2]));
                             } 
                             else if (arg[1] == "author") {
-                                if (authorManager.delete(int.Parse(arg[2])) == 1) {
-                                    Console.WriteLine("Author is deleted");
-                                } else {
-                                    Console.WriteLine("No author with such id");
-                                }
+                                delete(authorManager, int.Parse(arg[2]), "author");
+                                albumManager.deleteByAuthor(int.Parse(arg[2]));
                             } 
                             else if (arg[1] == "album") {
-                                if (albumManager.delete(int.Parse(arg[2])) == 1) {
-                                    Console.WriteLine("Album is deleted");
-                                } else {
-                                    Console.WriteLine("No album with such id");
-                                }
-                                    
+                                delete(albumManager, int.Parse(arg[2]), "album");
                             } else {
                                 Console.WriteLine("Command is not correct");
                             }

@@ -114,6 +114,34 @@ namespace task2Console
                 Console.WriteLine(man.getById(albumsList[i].authorId) + " - " + albumsList[i].name + ": " + count);
             }
         }
+
+        public void deleteByGenre(int genreId){ 
+            for (int i = 0; i < albumsList.Count; i++){
+                List<int> genresList = getGenresList(albumsList[i].id);
+                for (int j = 0; j < genresList.Count; j++){ 
+                    if (genresList[j] == genreId){
+                        delete(albumsList[i].id);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void deleteByCountry(int countryId){
+            for (int i = 0; i < albumsList.Count; i++) {
+                if (albumsList[i].countryId == countryId){
+                    delete(albumsList[i].id);
+                }
+            }
+        }
+        public void deleteByAuthor(int authorId)
+        {
+            for (int i = 0; i < albumsList.Count; i++) {
+                if (albumsList[i].authorId == authorId) {
+                    delete(albumsList[i].id);
+                }
+            }
+        }
     }
 
 }
