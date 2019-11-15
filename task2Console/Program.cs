@@ -387,8 +387,8 @@ namespace task2Console
                     }break;
                     case "showAuthor": {
                         try{
-                            int id = int.Parse(Console.ReadLine());
-                            albumManager.getAuthorId(id);
+                            int id = int.Parse(arg[1]);
+                            Console.WriteLine(albumManager.getAuthorId(id));
                         }
                         catch(FormatException){
                             Console.WriteLine("Id must be a number");
@@ -398,8 +398,8 @@ namespace task2Console
                     break;
                     case "showCountry":{
                         try {
-                            int id = int.Parse(Console.ReadLine());
-                                albumManager.getCounryId(id);
+                            int id = int.Parse(arg[1]);
+                            Console.WriteLine(albumManager.getCounryId(id));
                         } catch (FormatException) {
                             Console.WriteLine("Id must be a number");
                         }
@@ -408,17 +408,16 @@ namespace task2Console
                     case "showGenres":{
 
                         try {
-                            string[] genres = Console.ReadLine().Split(' ');
+                            
                             List<int> tmpGenres = new List<int>();
-                            for (int i = 0; i < genres.Length; i++){
-                                int id = int.Parse(genres[i]);
-                                tmpGenres.Add(id);
-                            }
-                            string genresToOutput = "";
+                            int id = int.Parse(arg[1]);
+                            tmpGenres = albumManager.getGenresList(id);
                             for (int i = 0; i < tmpGenres.Count; i++){
-                                genresToOutput += tmpGenres[i] + ' ';    
+                                Console.Write(tmpGenres[i]);
+                                Console.Write(' ');
                             }
-                            Console.WriteLine(genresToOutput);
+                            Console.WriteLine();
+                            
                         } catch (FormatException) {
                             Console.WriteLine("Id must be a number");
                         }
@@ -428,7 +427,9 @@ namespace task2Console
                             albumManager.showAll();
                         }
                         break;
-                    case "showStore":{ } break;
+                    case "showStore":{
+                            albumManager.showStore();    
+                    } break;
                     case "exit":
                         return;
                     default:{ Console.WriteLine(""); } break; 
