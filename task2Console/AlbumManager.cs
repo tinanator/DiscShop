@@ -8,12 +8,14 @@ namespace task2Console
 {
     class AlbumManager : Manager
     {
+        public AlbumManager(AuthorManager man, StoreManager store) {
+            this.man = man;
+            this.store = store;
+        }
+        private AuthorManager man;
+        private StoreManager store;
         static List<Album> albumsList = new List<Album>();
         static int nextId = 0;
-        AuthorManager man = new AuthorManager();
-        GenreManager genreman = new GenreManager();
-        CountryManager countryman = new CountryManager();
-        StoreManager store = new StoreManager();
         public int add(string newName, int authorId, List<int> genresId, int countryId)
         {
             for (int i = 0; i < albumsList.Count; i++) {
@@ -44,10 +46,16 @@ namespace task2Console
         }
         public override string getById(int id){ 
             if (albumsList.Exists(x => x.id == id)){
-
                 return albumsList[albumsList.FindIndex(x => x.id == id)].name;
             }
             return "no";
+        }
+
+        public int getAuthorId(int albumId){
+            if (albumsList.Exists(x => x.id == albumId)) {
+                return albumsList[albumsList.FindIndex(x => x.id == albumId)].authorId;
+            }
+            return -1;
         }
 
         public override int delete(int id){
@@ -85,6 +93,25 @@ namespace task2Console
         public void showAll(){
             for (int i = 0; i < albumsList.Count; i++) {
                 Console.WriteLine(man.getById(albumsList[i].authorId) + " - " + albumsList[i].name);
+            }
+        }
+
+        public List<int> getGenresList(int albumId){
+            if (albumsList.Exists(x => x.id == albumId)) {
+                return albumsList[albumsList.FindIndex(x => x.id == albumId)].genresId;
+            }
+            return new List<int>() { -1 };
+        }
+        public int getCounryId(int albumId){
+            if (albumsList.Exists(x => x.id == albumId)) {
+                return albumsList[albumsList.FindIndex(x => x.id == albumId)].countryId;
+            }
+            return -1;
+        }
+        public void showStore(){
+            for (int i = 0; i < albumsList.Count; i++) {
+                int count = store.getCount(albumsList[i].id);
+                Console.WriteLine(man.getById(albumsList[i].authorId) + " - " + albumsList[i].name + ": " + count);
             }
         }
     }

@@ -26,14 +26,14 @@ namespace task2Console
         }
         static void Main(string[] args)
         {
-
             bool isReading = true;
+            StoreManager store = new StoreManager();
+            CashierManager cashier = new CashierManager(store);
             GenreManager genreManager = new GenreManager();
             AuthorManager authorManager = new AuthorManager();
             CountryManager countryManager = new CountryManager();
-            AlbumManager albumManager = new AlbumManager();
-            StoreManager store = new StoreManager();
-            CashierManager cashier = new CashierManager(store);
+            AlbumManager albumManager = new AlbumManager(authorManager, store);
+
 
             ///////////////////////test//////////////////////////////////////////////////////
             var genres1 = new List<string> {"rock", "jazz", "blues", "rnb",
@@ -80,255 +80,232 @@ namespace task2Console
                         }
                     }
                 }
-
-
                 ///////////////////////////////////////////////
            
                 switch (arg[0]){
                     case "add":{
-                            try{
-                                if (arg[1] == "genre") {
-                                    add(genreManager, arg[2]);
+                        try{
+                            if (arg[1] == "genre") {
+                                add(genreManager, arg[2]);
+                            }
+                            else if (arg[1] == "author") {
+                                add(authorManager, getName(ref arg));
+                            }
+                            else if (arg[1] == "country") {
+                                add(countryManager, getName(ref arg));
+                            }
+                            else if (arg[1] == "album") {
+                                string name = getName(ref arg);
+                                if (name == "") {
+                                    Console.WriteLine("Wrong name");
+                                    continue;
                                 }
-                                else if (arg[1] == "author") {
-                                    add(authorManager, getName(ref arg));
-                                }
-                                else if (arg[1] == "country") {
-                                    add(countryManager, getName(ref arg));
-                                }
-                                else if (arg[1] == "album") {
-                                    string name = getName(ref arg);
-                                    if (name == "") {
-                                        Console.WriteLine("Wrong name");
+                                Console.Write("author id: ");
+                                int author = 0;
+                                author = int.Parse(Console.ReadLine());
+                                if (authorManager.isIdExists(author) == 0){
+                                    Console.WriteLine("No author with this id");
+                                    continue;
+                                } else {
+                                    Console.Write("genres ids: ");
+                                    string[] genres = Console.ReadLine().Split(' ');
+                                    List<int> genresList = new List<int>();
+                                    bool b = false;
+                                    for (int i = 0; i < genres.Length; i++) {
+                                        if (genreManager.isIdExists(int.Parse(genres[i])) == 0) {
+                                            Console.WriteLine("No genre with this id");
+                                            b = true;
+                                        }
+                                    genresList.Add(int.Parse(genres[i]));
+                                    }
+                                    if (b) continue;
+                                    Console.Write("country id: ");
+                                    int country = int.Parse(Console.ReadLine());
+                                    if (countryManager.isIdExists(country) == 0) {
+                                        Console.WriteLine("No country with this id");
                                         continue;
                                     }
-                                    Console.Write("author id: ");
-                                    int author = 0;
-                                    try {
-                                        author = int.Parse(Console.ReadLine());
-                                        if (authorManager.isIdExists(author) == 0){
-                                            Console.WriteLine("No author with this id");
-                                            continue;
-                                        } else {
-                                            Console.Write("genres ids: ");
-                                            string[] genres = Console.ReadLine().Split(' ');
-                                            List<int> genresList = new List<int>();
-                                            bool b = false;
-                                            for (int i = 0; i < genres.Length; i++) {
-                                                if (genreManager.isIdExists(int.Parse(genres[i])) == 0) {
-                                                    Console.WriteLine("No genre with this id");
-                                                    b = true;
-                                                }
-
-                                                genresList.Add(int.Parse(genres[i]));
-                                            }
-                                            if (b) continue;
-                                            Console.Write("country id: ");
-                                            int country = int.Parse(Console.ReadLine());
-                                            if (countryManager.isIdExists(country) == 0) {
-                                                Console.WriteLine("No country with this id");
-                                                continue;
-                                            }
-                                            int id = albumManager.add(name.Trim(), author, genresList, country);
-                                            if (id == -1) {
-                                                Console.WriteLine("already exists");
-                                                continue;
-                                            } else {
-                                                Console.WriteLine("id = " + id);
-                                            }
-                                            store.add(id, 0);
-                                        }
-
-                                    } catch (FormatException e) {
-
-                                        Console.WriteLine("Id must be a number");
-
+                                    int id = albumManager.add(name.Trim(), author, genresList, country);
+                                    if (id == -1) {
+                                        Console.WriteLine("already exists");
+                                        continue;
+                                    } else {
+                                        Console.WriteLine("id = " + id);
                                     }
-                                } else {
-                                    Console.WriteLine("command is not correct");
+                                    store.add(id, 0);
                                 }
+                            } 
+                            else {
+                                Console.WriteLine("command is not correct");
                             }
-                            catch(IndexOutOfRangeException e){
-                                Console.WriteLine("Command is not correct");
-                            }
-                            
                         }
-                        break;
+                        catch(IndexOutOfRangeException){
+                            Console.WriteLine("not enough arguments");
+                        }
+                        catch(FormatException){
+                            Console.WriteLine("Id must be a number");
+                        }   
+                    }
+                    break;
 
                     case "getId":{ 
-                            try{
-                                if (arg[1] == "genre") {
-                                    int id = genreManager.getId(arg[2]);
-                                    if (id == -1) {
-                                        Console.WriteLine("This genre doesn't exist");
-                                    } else {
-                                        Console.WriteLine("id = " + id);
-                                    }
-                                }
-
-
-                                else if (arg[1] == "author") {
-                                    string name = getName(ref arg);
-                                    if (name == ""){
-                                        Console.WriteLine("Command is not correct");
-                                        continue;
-                                    }
-                                    int id = authorManager.getId(name);
-                                    if (id == -1) {
-                                        Console.WriteLine("This author doesn't exist");
-                                    } else {
-                                        Console.WriteLine("id = " + id);
-                                    }
-                                }
-
-                                else if (arg[1] == "country") {
-                                    string name = getName(ref arg);
-                                    int id = countryManager.getId(name);
-                                    if (id == -1) {
-                                        Console.WriteLine("This country doesn't exists");
-                                    } else {
-                                        Console.WriteLine("id = " + id);
-                                    }
-                                }
-
-                                else if (arg[1] == "album") {
-                                    string name = getName(ref arg);
-                                    if (name == ""){
-                                        Console.WriteLine("Command is not correct");
-                                        continue;
-                                    }
-                                    Console.Write("Author: ");
-                                    try{
-
-                                        int albumId = albumManager.getId(name, int.Parse(Console.ReadLine()));
-                                        if (albumId == -1){
-                                            Console.WriteLine("This album doesn't exist");
-                                        }
-                                        else{
-                                            Console.WriteLine("id = " + albumId);
-                                        }
-                                    }
-                                    catch(FormatException){
-                                        Console.WriteLine("Id must be a number");
-                                    }
-                                   
+                        try{
+                            if (arg[1] == "genre") {
+                                int id = genreManager.getId(arg[2]);
+                                if (id == -1) {
+                                    Console.WriteLine("This genre doesn't exist");
                                 } else {
-                                    Console.WriteLine("Command is not correct");
+                                    Console.WriteLine("id = " + id);
                                 }
                             }
-                            catch(IndexOutOfRangeException){
+                            else if (arg[1] == "author") {
+                                string name = getName(ref arg);
+                                if (name == ""){
+                                    Console.WriteLine("Command is not correct");
+                                    continue;
+                                }
+                                int id = authorManager.getId(name);
+                                if (id == -1) {
+                                    Console.WriteLine("This author doesn't exist");
+                                } else {
+                                    Console.WriteLine("id = " + id);
+                                }
+                            }
+                            else if (arg[1] == "country") {
+                                string name = getName(ref arg);
+                               
+                                if (name == "") {
+                                    Console.WriteLine("Command is not correct");
+                                    continue;
+                                }
+                                int id = countryManager.getId(name);
+                                if (id == -1) {
+                                Console.WriteLine("This country doesn't exists");
+                                } else {
+                                    Console.WriteLine("id = " + id);
+                                }
+                            }
+                            else if (arg[1] == "album") {
+                                string name = getName(ref arg);
+                                if (name == ""){
+                                    Console.WriteLine("Command is not correct");
+                                    continue;
+                                }
+                                Console.Write("Author: ");
+                                try{
+
+                                    int albumId = albumManager.getId(name, int.Parse(Console.ReadLine()));
+                                    if (albumId == -1){
+                                        Console.WriteLine("This album doesn't exist");
+                                    }
+                                    else{
+                                        Console.WriteLine("id = " + albumId);
+                                    }
+                                }
+                                catch(FormatException){
+                                    Console.WriteLine("Id must be a number");
+                                }
+                            } 
+                            else {
                                 Console.WriteLine("Command is not correct");
                             }
+                        }
+                        catch(IndexOutOfRangeException){
+                            Console.WriteLine("not enough arguments");
+                        }
                             
 
-                            break;
+                    break;
                     }
                     case "delete":{ 
-                            try{
-                                if (arg[1] == "genre") {
-                                    try{
-                                        if (genreManager.delete(int.Parse(arg[2])) == 1) {
-                                            Console.WriteLine("Genre is deleted");
-                                        } else{
-                                            Console.WriteLine("No genre with such id");
-                                        }
-                                    }
-                                    catch(FormatException e){
-                                        Console.WriteLine("Id must be a number");
-                                    }
-
-                                } else if (arg[1] == "country") {
-                                    try{
-                                        if (countryManager.delete(int.Parse(arg[2])) == 1) {
-                                            Console.WriteLine("Country is deleted");
-                                        } else {
-                                            Console.WriteLine("No country with such id");
-                                        }
-                                    } catch(FormatException e){
-                                        Console.WriteLine("Id must be a number"); 
-                                    }
-                                    
-                                } else if (arg[1] == "author") {
-                                    try {
-                                        if (authorManager.delete(int.Parse(arg[2])) == 1) {
-                                            Console.WriteLine("Author is deleted");
-                                        } else {
-                                            Console.WriteLine("No author with such id");
-                                        }
-                                    } catch (FormatException e) {
-                                        Console.WriteLine("Id must be a number"); 
-                                    }
-                                    
-                                } else if (arg[1] == "album") {
-                                    try {
-                                        if (albumManager.delete(int.Parse(arg[2])) == 1) {
-                                            Console.WriteLine("Album is deleted");
-                                        } else {
-                                            Console.WriteLine("No album with such id");
-                                        }
-                                    } catch (FormatException e) { 
-                                        Console.WriteLine("Id must be a number"); 
-                                    }
-                                    
-                                } else {
-                                    Console.WriteLine("Command is not correct");
+                        try{
+                            if (arg[1] == "genre") {
+                                if (genreManager.delete(int.Parse(arg[2])) == 1) {
+                                    Console.WriteLine("Genre is deleted");
+                                } else{
+                                    Console.WriteLine("No genre with such id");
                                 }
-                            }
-                            catch(IndexOutOfRangeException e){
+                            } 
+                            else if (arg[1] == "country") {
+                                if (countryManager.delete(int.Parse(arg[2])) == 1) {
+                                    Console.WriteLine("Country is deleted");
+                                } else {
+                                    Console.WriteLine("No country with such id");
+                                }
+                            } 
+                            else if (arg[1] == "author") {
+                                if (authorManager.delete(int.Parse(arg[2])) == 1) {
+                                    Console.WriteLine("Author is deleted");
+                                } else {
+                                    Console.WriteLine("No author with such id");
+                                }
+                            } 
+                            else if (arg[1] == "album") {
+                                if (albumManager.delete(int.Parse(arg[2])) == 1) {
+                                    Console.WriteLine("Album is deleted");
+                                } else {
+                                    Console.WriteLine("No album with such id");
+                                }
+                                    
+                            } else {
                                 Console.WriteLine("Command is not correct");
                             }
-                        }break;
+                        }
+                        catch(IndexOutOfRangeException){
+                            Console.WriteLine("not enough arguments");
+                        }
+                    }break;
                     case "getById":{ 
-                            try{
-                                if (arg[1] == "genre") {
-                                    try{
-                                        int id = int.Parse(arg[2]);
-                                        if (genreManager.isIdExists(id) == 0) {
-                                            Console.WriteLine("No genre with this id");
-                                        }
-                                        Console.WriteLine(genreManager.getById(id));
-                                    }
-                                    catch(FormatException e) { Console.WriteLine("Id must be number"); }
-                                    
-                                } else if (arg[1] == "author") {
-                                    try {
-                                        int id = int.Parse(arg[2]);
-                                        if (authorManager.isIdExists(id) == 0) {
-                                            Console.WriteLine("No author with this id");
-                                        }
-                                        Console.WriteLine(authorManager.getById(id));
-                                    } catch (FormatException e) { Console.WriteLine("Id must be number"); }
-                                    
-                                
-                                } else if (arg[1] == "country") {
-                                    try {
-
-                                        int id = int.Parse(arg[2]);
-                                        if (countryManager.isIdExists(id) == 0) {
-                                            Console.WriteLine("No country with this id");
-                                        }
-                                        Console.WriteLine(countryManager.getById(id));
-                                    } catch (FormatException e) { Console.WriteLine("Id must be number"); }
-
-                                } else if (arg[1] == "album") {
-                                    try {
-                                        int id = int.Parse(arg[2]);
-                                        if (albumManager.isIdExists(id) == 0) {
-                                            Console.WriteLine("No album with this id");
-                                        }
-                                        Console.WriteLine(albumManager.getById(id));
-                                    } catch (FormatException e) { Console.WriteLine("Id must be number"); }
-                                    
+                        try{
+                            if (arg[1] == "genre") {
+                               
+                                int id = int.Parse(arg[2]);
+                                if (genreManager.isIdExists(id) == 0) {
+                                    Console.WriteLine("No genre with this id");
+                                    continue;
                                 }
-                                else{
-                                    Console.WriteLine("Command is not correct");
+                                Console.WriteLine(genreManager.getById(id));
+                                    
+                            } else if (arg[1] == "author") {
+                               
+                                int id = int.Parse(arg[2]);
+                                if (authorManager.isIdExists(id) == 0) {
+                                    Console.WriteLine("No author with this id");
                                 }
-
-                            } catch (IndexOutOfRangeException e){
-                                Console.WriteLine("Command is nor correct");
-                            }
+                                Console.WriteLine(authorManager.getById(id));
+  
+                            } else if (arg[1] == "country") {
+                             
+                                int id = int.Parse(arg[2]);
+                                if (countryManager.isIdExists(id) == 0) {
+                                    Console.WriteLine("No country with this id");
+                                    continue;
+                                }
+                                Console.WriteLine(countryManager.getById(id));
+                               
+                            } else if (arg[1] == "album") {
+                               
+                                int id = int.Parse(arg[2]);
+                                if (albumManager.isIdExists(id) == 0) {
+                                    Console.WriteLine("No album with this id");
+                                    continue;
+                                }
                             
-                        }break;
+                                Console.WriteLine(albumManager.getById(id) + " - " + albumManager.getAuthorId(id));
+                               
+                            }
+                            else{
+                                Console.WriteLine("Command is not correct");
+                            }
+                        } 
+                        catch (IndexOutOfRangeException){
+                            Console.WriteLine("not enough arguments");
+                        }
+                        catch (FormatException){
+                            Console.WriteLine("Id must be a number");        
+                        }
+                            
+                    }break;
                     
                     case "addToStore": {
                             try{
@@ -341,74 +318,112 @@ namespace task2Console
                                 store.add(id, count);
                                 Console.WriteLine("Added " + count + " discs");
                             }
-                            catch(IndexOutOfRangeException e){
-                                Console.WriteLine("Command is not correct");
+                            catch(IndexOutOfRangeException){
+                                Console.WriteLine("not enough arguments");
                             }
-                            catch(FormatException e){
+                            catch(FormatException){
                                 Console.WriteLine("Id and count must be numbers");
                             }
 
                         }break;
                     case "buy":{
-                            try{
-                                int id = int.Parse(arg[1]);
-                                if (albumManager.getById(id) == "no") {
-                                    Console.WriteLine("Your order is rejected. No disc with such id");
-                                    continue;
-                                }
-                                int count = int.Parse(arg[2]);
-                                int isBought = cashier.buy(id, count);
-                                if (isBought == 1) {
-                                    Console.WriteLine("Your order is accepted");
-                                } else {
-                                    Console.WriteLine("Your order is rejected");
-                                }
+                        try{
+                            int id = int.Parse(arg[1]);
+                            if (albumManager.getById(id) == "no") {
+                                Console.WriteLine("Your order is rejected. No disc with such id");
+                                continue;
                             }
-                            catch(FormatException e){
-                                Console.WriteLine("id and count must be numbers");
+                            int count = int.Parse(arg[2]);
+                            int isBought = cashier.buy(id, count);
+                            if (isBought == 1) {
+                                Console.WriteLine("Your order is accepted");
+                            } else {
+                                Console.WriteLine("Your order is rejected");
                             }
-                            catch(IndexOutOfRangeException e){
-                                Console.WriteLine("Command is not correct");
-                            }
-                            
-                        } break;
-                    case "count":{
-                            try{
-                                int id = int.Parse(arg[1]);
-                                if (albumManager.getById(id) == "no") {
-                                    Console.WriteLine("No album with such id");
-                                    continue;
-                                }
-                                Console.WriteLine(store.getCount(id));
-                            }
-                            catch(IndexOutOfRangeException e) {
-                                Console.WriteLine("Command is not correct");
-                            }
-                            catch(FormatException e){
-                                Console.WriteLine("Id and count must be numbers");
-                            }
-                            
-
                         }
-                        break;
-                    case "showBy":{
-                            try{
-                                if (arg[1] == "genre") {
-                                    albumManager.showByGenre(int.Parse(arg[2]));
-                                } else if (arg[1] == "country") {
-                                    albumManager.showByCountry(int.Parse(arg[2]));
-                                } else if (arg[1] == "author") {
-                                    albumManager.showByAuthor(int.Parse(arg[2]));
-                                }
-                            }
-                            catch(IndexOutOfRangeException e){
-                                Console.WriteLine("Command is not correct");
-                            }
-                            catch(FormatException e){
-                                Console.WriteLine("Id must be a number");
-                            }
+                        catch(FormatException){
+                            Console.WriteLine("id and count must be numbers");
+                        }
+                        catch(IndexOutOfRangeException){
+                            Console.WriteLine("not enough arguments");
+                        }
                             
-                        }break;
+                    } break;
+                    case "count":{
+                        try{
+                            int id = int.Parse(arg[1]);
+                            if (albumManager.getById(id) == "no") {
+                                Console.WriteLine("No album with such id");
+                                continue;
+                            }
+                            Console.WriteLine(store.getCount(id));
+                        }
+                        catch(IndexOutOfRangeException) {
+                            Console.WriteLine("not enough arguments");
+                        }
+                        catch(FormatException){
+                            Console.WriteLine("Id and count must be numbers");
+                        }
+                          
+                    }
+                    break;
+                    case "showBy":{
+                        try{
+                            if (arg[1] == "genre") {
+                                albumManager.showByGenre(int.Parse(arg[2]));
+                            } else if (arg[1] == "country") {
+                                albumManager.showByCountry(int.Parse(arg[2]));
+                            } else if (arg[1] == "author") {
+                                albumManager.showByAuthor(int.Parse(arg[2]));
+                            }
+                        }
+                        catch(IndexOutOfRangeException){
+                            Console.WriteLine("not enough arguments");
+                        }
+                        catch(FormatException){
+                            Console.WriteLine("Id must be a number");
+                        }
+                            
+                    }break;
+                    case "showAuthor": {
+                        try{
+                            int id = int.Parse(Console.ReadLine());
+                            albumManager.getAuthorId(id);
+                        }
+                        catch(FormatException){
+                            Console.WriteLine("Id must be a number");
+                        }
+                        
+                    }
+                    break;
+                    case "showCountry":{
+                        try {
+                            int id = int.Parse(Console.ReadLine());
+                                albumManager.getCounryId(id);
+                        } catch (FormatException) {
+                            Console.WriteLine("Id must be a number");
+                        }
+                    }
+                    break;
+                    case "showGenres":{
+
+                        try {
+                            string[] genres = Console.ReadLine().Split(' ');
+                            List<int> tmpGenres = new List<int>();
+                            for (int i = 0; i < genres.Length; i++){
+                                int id = int.Parse(genres[i]);
+                                tmpGenres.Add(id);
+                            }
+                            string genresToOutput = "";
+                            for (int i = 0; i < tmpGenres.Count; i++){
+                                genresToOutput += tmpGenres[i] + ' ';    
+                            }
+                            Console.WriteLine(genresToOutput);
+                        } catch (FormatException) {
+                            Console.WriteLine("Id must be a number");
+                        }
+                    }
+                    break;
                     case "showAll":{
                             albumManager.showAll();
                         }
@@ -416,8 +431,7 @@ namespace task2Console
                     case "showStore":{ } break;
                     case "exit":
                         return;
-                    case "":{}break;
-                    default: { Console.WriteLine("\n\n"); }break;
+                    default:{ Console.WriteLine(""); } break; 
                     
                 }
             }

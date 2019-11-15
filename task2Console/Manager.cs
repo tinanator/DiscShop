@@ -9,7 +9,7 @@ namespace task2Console
         public Manager(){ }
         public virtual int getId(string name){ return 0;}
         public virtual int add(string name){ return 0; }
-        public virtual int delete(int id){ }
+        public virtual int delete(int id){ return 0; }
         public virtual string getById(int id){ return "no"; }
 
     }

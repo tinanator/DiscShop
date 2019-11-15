@@ -29,5 +29,7 @@ namespace task2Console
         public void remove(int id){
             discs.Remove(id);
         }
+
+       
     }
 }
